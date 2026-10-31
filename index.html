@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArnTech Pilot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f6fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ArnTech Pilot">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" id="touchIcon" href="icon.svg">
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--line:#e6ebf3;--tx:#0f1b33;--mu:#6b7a94;--up:#0a9f6e;--dn:#e5484d;--ac:#2563eb;--ac2:#06b6d4;--sh:0 6px 24px rgba(30,60,120,.08);color-scheme:light}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(800px 420px at 90% -8%,rgba(6,182,212,.14),transparent),radial-gradient(700px 400px at -10% 0,rgba(37,99,235,.10),transparent),var(--bg);color:var(--tx);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top);overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;padding:14px 18px 8px}
+header img{width:42px;height:42px;border-radius:12px;box-shadow:0 6px 16px rgba(37,99,235,.3)}
+header h1{font-size:19px;margin:0;letter-spacing:-.2px}
+header small{color:var(--mu);font-size:12px;display:block}
+.pill{margin-left:auto;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;background:#fff;border:1px solid var(--line);color:var(--mu);box-shadow:var(--sh)}
+.pill.on{color:var(--up);background:#e8f8f1;border-color:#bfead8}
+.pill.halt{color:var(--dn);background:#fdecec;border-color:#f6c6c8}
+main{flex:1;overflow-y:auto;padding:8px 16px 24px;-webkit-overflow-scrolling:touch}
+.tab{display:none}.tab.show{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+.hero{background:linear-gradient(135deg,#2563eb,#06b6d4 70%,#10b981);color:#fff;border:0;box-shadow:0 14px 34px rgba(37,99,235,.28)}
+.hero .lbl,.hero .sub{color:rgba(255,255,255,.8)}
+.lbl{color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.9px;font-weight:600}
+.big{font-size:36px;font-weight:800;letter-spacing:-1px;margin:2px 0}
+.up{color:var(--up)}.dn{color:var(--dn)}
+canvas{width:100%;height:120px;display:block;margin-top:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.grid .card{margin:0;padding:12px}
+.grid b{font-size:17px;display:block;margin-top:3px}
+.row{display:flex;gap:10px;margin-bottom:12px}
+button{font:inherit;font-weight:700;border:0;border-radius:16px;padding:15px;color:#fff;background:linear-gradient(135deg,var(--ac),var(--ac2));flex:1;cursor:pointer;box-shadow:0 8px 20px rgba(37,99,235,.25)}
+button:active{transform:scale(.97)}
+button.alt{background:#fff;color:var(--tx);border:1px solid var(--line);box-shadow:none}
+button.kill{background:#fff;color:var(--dn);border:1px solid #f6c6c8;box-shadow:none;flex:.5}
+button.x{flex:0;padding:6px 10px;border-radius:10px;font-size:12px;background:#fdecec;color:var(--dn);box-shadow:none;margin-left:8px}
+.seg{display:flex;background:#eef2f9;border-radius:14px;padding:4px;margin-bottom:12px}
+.seg button{background:none;color:var(--mu);box-shadow:none;padding:10px}
+.seg button.on{background:#fff;color:var(--ac);box-shadow:var(--sh)}
+.li{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border:0}
+.tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:7px;margin-right:8px}
+.tag.buy{background:#e8f8f1;color:var(--up)}.tag.sell{background:#fdecec;color:var(--dn)}
+.sub{color:var(--mu);font-size:12px}
+.empty{color:var(--mu);text-align:center;padding:18px 0}
+label{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+label:last-child{border:0}
+input[type=number],input[type=text],input[type=password]{background:#f3f6fb;border:1px solid var(--line);border-radius:12px;color:var(--tx);padding:10px;font:inherit}
+input[type=number]{width:84px;text-align:right}
+.full{width:100%;margin-bottom:10px}
+input[type=checkbox]{width:22px;height:22px;accent-color:#2563eb}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding-top:10px}
+.chip{padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:#f3f6fb;font-weight:700;font-size:13px;color:var(--mu);cursor:pointer}
+.chip.on{background:#e7efff;color:var(--ac);border-color:#c5d6ff}
+.meter{height:10px;background:#eef2f9;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#10b981,#f59e0b,#e5484d);border-radius:99px;transition:width .4s}
+.log{font-size:13px;padding:7px 0;border-bottom:1px solid var(--line);display:flex;gap:10px}
+.log span{color:var(--mu);min-width:50px}
+.log:last-child{border:0}
+nav{display:flex;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+nav a{flex:1;text-align:center;color:var(--mu);font-size:11px;padding:6px 0;cursor:pointer;font-weight:700}
+nav a svg{display:block;margin:0 auto 3px;width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav a.on{color:var(--ac)}
+#hint,#toast{display:none;margin:0 16px 8px;padding:12px 14px;border-radius:14px;background:#e7efff;border:1px solid #c5d6ff;font-size:13px}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));max-width:528px;margin:0 auto;background:#0f1b33;color:#fff;border:0;z-index:9;text-align:center}
+ol{padding-left:18px;margin:6px 0}ol li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+<img src="icon.svg" alt="ArnTech Pilot logo">
+<div><h1>ArnTech Pilot</h1><small id="modeLbl">Simulation</small></div>
+<span class="pill" id="status">Stopped</span>
+</header>
+<div id="hint"></div>
+<main>
+<section class="tab show" id="t-home">
+<div class="card hero"><div class="lbl">Account equity</div><div class="big" id="eq">$0</div><div id="dayPnl" class="sub"></div><canvas id="chart" width="600" height="240"></canvas></div>
+<div class="row"><button id="toggle">Start bot</button><button class="kill" id="kill">Kill</button></div>
+<div class="grid">
+<div class="card"><span class="lbl">Win rate</span><b id="wr">–</b></div>
+<div class="card"><span class="lbl">Profit factor</span><b id="pf">–</b></div>
+<div class="card"><span class="lbl">Trades</span><b id="nt">0</b></div>
+<div class="card"><span class="lbl">Open P/L</span><b id="open">$0</b></div>
+<div class="card"><span class="lbl">Best trade</span><b id="best">–</b></div>
+<div class="card"><span class="lbl">Max drawdown</span><b id="dd">0%</b></div>
+</div>
+<div class="card"><div class="lbl">Daily loss limit used</div><div class="meter"><i id="meter"></i></div><div class="sub" id="meterTx"></div></div>
+<div class="card"><div class="lbl">Markets</div><div id="mkts"></div></div>
+<div class="card"><div class="lbl">Activity</div><div id="log"></div></div>
+</section>
+<section class="tab" id="t-trades">
+<div class="card"><div class="lbl">Open positions</div><div id="pos"></div></div>
+<div class="card"><div class="lbl">History</div><div id="hist"></div></div>
+</section>
+<section class="tab" id="t-cfg">
+<div class="card">
+<label>Risk per trade (%)<input type="number" id="risk" step="0.1" min="0.1"></label>
+<label>Stop loss (pips)<input type="number" id="sl" min="3"></label>
+<label>Reward : Risk<input type="number" id="rr" step="0.1" min="0.5"></label>
+<label>Fast EMA<input type="number" id="fast" min="2"></label>
+<label>Slow EMA<input type="number" id="slow" min="3"></label>
+<label>RSI filter<input type="checkbox" id="rsi"></label>
+<label>London/NY hours only<input type="checkbox" id="session"></label>
+<label>Max open trades<input type="number" id="maxPos" min="1"></label>
+<label>Daily loss limit (%)<input type="number" id="dailyLoss" step="0.5" min="0.5"></label>
+<div class="lbl" style="padding-top:12px">Pairs to trade</div><div class="chips" id="chips"></div>
+</div>
+<div class="row"><button class="alt" id="newday">New trading day</button><button class="alt" id="reset">Reset simulation</button></div>
+</section>
+<section class="tab" id="t-link">
+<div class="seg"><button id="m-sim">Simulation</button><button id="m-live">Demo account</button></div>
+<div class="card">
+<div class="lbl" style="margin-bottom:8px">Worker connection</div>
+<input type="text" class="full" id="url" placeholder="https://arntech-pilot.yourname.workers.dev" autocapitalize="off" autocorrect="off">
+<input type="password" class="full" id="key" placeholder="App key">
+<div class="row" style="margin:0"><button id="connect">Save &amp; connect</button></div>
+<p class="sub" id="connMsg">Your broker token stays on the Worker. This app only holds the app key.</p>
+</div>
+<div class="card"><div class="lbl">Setup</div>
+<ol class="sub">
+<li>Create an OANDA practice account and an API token.</li>
+<li>Deploy <b>worker.js</b> with Wrangler, add the 3 secrets and a KV namespace.</li>
+<li>Paste the Worker URL and your app key above, then start the bot.</li>
+</ol></div>
+</section>
+</main>
+<div id="toast"></div>
+<nav>
+<a class="on" data-t="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</a>
+<a data-t="trades"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Trades</a>
+<a data-t="cfg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Strategy</a>
+<a data-t="link"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>Connect</a>
+</nav>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const ST=(k,v)=>{try{v===undefined?0:localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const LD=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const PAIRS={EUR_USD:{p:1.0850,d:5},GBP_USD:{p:1.2700,d:5},USD_JPY:{p:150.2,d:3},AUD_USD:{p:.6600,d:5}};
+const jpy=k=>k.endsWith('JPY'),pip=k=>jpy(k)?.01:.0001,nm=k=>k.replace('_','/'),dec=k=>jpy(k)?3:5;
+const DEF={bal:10000,pos:[],hist:[],eq:[10000],log:[],on:false,halted:false,dayStart:10000,peak:10000,maxDD:0,
+cfg:{risk:1,sl:20,rr:2,fast:5,slow:13,rsi:true,session:false,maxPos:3,dailyLoss:3,pairs:Object.keys(PAIRS)}};
+let S=Object.assign(JSON.parse(JSON.stringify(DEF)),LD('atp_sim',{}));
+let L=Object.assign({mode:'sim',url:'',key:''},LD('atp_conn',{}));
+let LV=null,LP={},LS=LD('atp_ls',[]),online=false;
+const save=()=>ST('atp_sim',S);
+const live=()=>L.mode==='live';
+
+// ---------- toast ----------
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2600);if(navigator.vibrate)navigator.vibrate(10)}
+
+// ---------- simulation engine ----------
+const M={};const drift={};
+for(const k in PAIRS){M[k]={price:PAIRS[k].p,prev:PAIRS[k].p,closes:[PAIRS[k].p],ticks:0};drift[k]=0}
+const conv=(k,p)=>jpy(k)?1/p:1;
+const pnlOf=(p,px)=>p.dir*(px-p.entry)*p.units*conv(p.pair,px);
+const floating=()=>S.pos.reduce((a,p)=>a+pnlOf(p,M[p.pair].price),0);
+const equity=()=>S.bal+floating();
+const slog=m=>{S.log.unshift({t:Date.now(),m});S.log=S.log.slice(0,30)};
+const ema=(a,n)=>{const k=2/(n+1);let e=a[0];return a.map(v=>e=v*k+e*(1-k))};
+const rsi=(a,n=14)=>{if(a.length<n+1)return 50;let g=0,l=0;for(let i=a.length-n;i<a.length;i++){const d=a[i]-a[i-1];d>=0?g+=d:l-=d}return l?100-100/(1+g/l):100};
+function signal(k){const c=M[k].closes,C=S.cfg;if(c.length<C.slow+2)return 0;
+const f=ema(c,C.fast),s=ema(c,C.slow),n=c.length-1,r=rsi(c);
+if(f[n-1]<=s[n-1]&&f[n]>s[n]&&(!C.rsi||r<70))return 1;
+if(f[n-1]>=s[n-1]&&f[n]<s[n]&&(!C.rsi||r>30))return -1;return 0}
+function simOpen(k,dir){const C=S.cfg,px=M[k].price,sl=C.sl*pip(k);
+const units=equity()*C.risk/100/(sl*conv(k,px));
+S.pos.push({id:Date.now()+Math.random(),pair:k,dir,entry:px,sl:px-dir*sl,tp:px+dir*sl*C.rr,units});
+slog(`${dir>0?'BUY':'SELL'} ${nm(k)} opened`)}
+function simClose(p,px,why){const v=pnlOf(p,px);S.bal+=v;S.pos=S.pos.filter(x=>x.id!==p.id);
+S.hist.unshift({pair:p.pair,dir:p.dir,entry:p.entry,exit:px,pnl:v,t:Date.now()});S.hist=S.hist.slice(0,60);
+slog(`${nm(p.pair)} closed by ${why} ${v>=0?'+':'-'}$${Math.abs(v).toFixed(2)}`)}
+const flatten=w=>S.pos.slice().forEach(p=>simClose(p,M[p.pair].price,w));
+function simTick(){
+for(const k in PAIRS){const m=M[k];if(Math.random()<.04)drift[k]=(Math.random()-.5)*.00035;
+m.prev=m.price;m.price*=1+drift[k]+(Math.random()-.5)*.0006;
+if(++m.ticks>=6){m.ticks=0;m.closes.push(m.price);if(m.closes.length>120)m.closes.shift();
+if(S.on&&!S.halted&&S.cfg.pairs.includes(k)&&!S.pos.some(p=>p.pair===k)&&S.pos.length<S.cfg.maxPos){const sg=signal(k);if(sg)simOpen(k,sg)}}}
+S.pos.slice().forEach(p=>{const px=M[p.pair].price;
+if(p.dir>0?px<=p.sl:px>=p.sl)simClose(p,p.sl,'SL');else if(p.dir>0?px>=p.tp:px<=p.tp)simClose(p,p.tp,'TP')});
+const e=equity();S.eq.push(e);if(S.eq.length>240)S.eq.shift();
+S.peak=Math.max(S.peak,e);S.maxDD=Math.max(S.maxDD,(S.peak-e)/S.peak*100);
+if(!S.halted&&(e-S.dayStart)/S.dayStart*100<=-S.cfg.dailyLoss){flatten('LIMIT');S.on=false;S.halted=true;slog('Daily loss limit reached. Bot halted.')}
+save()}
+
+// ---------- live (Worker) ----------
+async function api(path,body){
+const r=await fetch(L.url.replace(/\/$/,'')+path,{method:body?'POST':'GET',headers:{'x-app-key':L.key,'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Error '+r.status);return j}
+async function poll(){
+if(!live()||!L.url)return;
+try{const j=await api('/api/status');LP=LV?LV.prices:{};LV=j;LS.push(j.nav);if(LS.length>240)LS.shift();ST('atp_ls',LS);online=true}
+catch(e){online=false;$('connMsg').textContent='Connection failed: '+e.message}
+render()}
+
+// ---------- view model ----------
+const ddOf=a=>{let pk=a[0]||0,d=0;a.forEach(v=>{pk=Math.max(pk,v);d=Math.max(d,(pk-v)/pk*100)});return d};
+function view(){
+if(live()&&LV){const s=LV.state;return{eq:LV.nav,dayStart:s.dayStart||LV.nav,fl:LV.unrl,pos:LV.open,hist:LV.closed,
+prices:Object.fromEntries(Object.keys(LV.prices).map(k=>[k,{p:LV.prices[k],prev:LP[k]??LV.prices[k]}])),
+on:s.on,halted:s.halted,cfg:s,log:LV.log,series:LS,dd:ddOf(LS)}}
+if(live())return{eq:0,dayStart:1,fl:0,pos:[],hist:[],prices:{},on:false,halted:false,cfg:S.cfg,log:[],series:[],dd:0};
+return{eq:equity(),dayStart:S.dayStart,fl:floating(),
+pos:S.pos.map(p=>({...p,pnl:pnlOf(p,M[p.pair].price)})),hist:S.hist,
+prices:Object.fromEntries(Object.keys(PAIRS).map(k=>[k,{p:M[k].price,prev:M[k].prev}])),
+on:S.on,halted:S.halted,cfg:S.cfg,log:S.log,series:S.eq,dd:S.maxDD}}
+
+// ---------- render ----------
+const money=v=>(v<0?'-':'')+'$'+Math.abs(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const cls=v=>v>=0?'up':'dn';
+const tm=t=>new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+function render(){
+const V=view(),d=V.eq-V.dayStart;
+$('modeLbl').textContent=live()?(online?'Demo account · connected':'Demo account · offline'):'Simulation';
+$('eq').textContent=money(V.eq);
+$('dayPnl').textContent=`${d>=0?'▲ +':'▼ '}${money(d)} (${(d/V.dayStart*100).toFixed(2)}%) today`;
+const st=$('status');st.className='pill'+(V.halted?' halt':V.on?' on':'');st.textContent=V.halted?'Halted':V.on?'Running':'Stopped';
+$('toggle').textContent=V.on?'Pause bot':'Start bot';
+const w=V.hist.filter(h=>h.pnl>0),l=V.hist.filter(h=>h.pnl<0);
+const gp=w.reduce((a,h)=>a+h.pnl,0),gl=-l.reduce((a,h)=>a+h.pnl,0);
+$('wr').textContent=V.hist.length?Math.round(w.length/V.hist.length*100)+'%':'–';
+$('pf').textContent=gl?(gp/gl).toFixed(2):(gp?'∞':'–');
+$('nt').textContent=V.hist.length;
+$('open').innerHTML=`<span class="${cls(V.fl)}">${money(V.fl)}</span>`;
+$('best').textContent=V.hist.length?money(Math.max(...V.hist.map(h=>h.pnl))):'–';
+$('dd').textContent=V.dd.toFixed(2)+'%';
+const used=Math.min(100,Math.max(0,-d/V.dayStart*100/V.cfg.dailyLoss*100));
+$('meter').style.width=used+'%';$('meterTx').textContent=`${used.toFixed(0)}% of the ${V.cfg.dailyLoss}% daily limit`;
+$('mkts').innerHTML=Object.keys(V.prices).map(k=>{const x=V.prices[k],u=x.p>=x.prev;
+return `<div class="li"><b>${nm(k)}</b><span class="${u?'up':'dn'}">${x.p.toFixed(dec(k))} ${u?'▲':'▼'}</span></div>`}).join('')||'<div class="empty">No prices yet</div>';
+$('log').innerHTML=V.log.length?V.log.slice(0,8).map(x=>`<div class="log"><span>${tm(x.t)}</span>${x.m}</div>`).join(''):'<div class="empty">No activity yet</div>';
+$('pos').innerHTML=V.pos.length?V.pos.map(p=>`<div class="li"><div><span class="tag ${p.dir>0?'buy':'sell'}">${p.dir>0?'BUY':'SELL'}</span><b>${nm(p.pair)}</b><div class="sub">@ ${p.entry.toFixed(dec(p.pair))} · SL ${p.sl?p.sl.toFixed(dec(p.pair)):'–'} · TP ${p.tp?p.tp.toFixed(dec(p.pair)):'–'}</div></div><div style="display:flex;align-items:center"><b class="${cls(p.pnl)}">${money(p.pnl)}</b><button class="x" data-id="${p.id}">Close</button></div></div>`).join(''):'<div class="empty">No open positions</div>';
+$('hist').innerHTML=V.hist.length?V.hist.slice(0,25).map(h=>`<div class="li"><div><span class="tag ${h.dir>0?'buy':'sell'}">${h.dir>0?'BUY':'SELL'}</span><b>${nm(h.pair)}</b><div class="sub">${tm(h.t)}</div></div><b class="${cls(h.pnl)}">${money(h.pnl)}</b></div>`).join(''):'<div class="empty">No closed trades yet</div>';
+$('m-sim').className=live()?'':'on';$('m-live').className=live()?'on':'';
+draw(V.series)}
+
+function draw(d){
+const cv=$('chart'),x=cv.getContext('2d'),W=cv.width,H=cv.height;x.clearRect(0,0,W,H);if(d.length<2)return;
+const mn=Math.min(...d),mx=Math.max(...d),r=(mx-mn)||1,pt=(v,i)=>[i/(d.length-1)*W,H-14-(v-mn)/r*(H-28)];
+x.beginPath();d.forEach((v,i)=>{const[a,b]=pt(v,i);i?x.lineTo(a,b):x.moveTo(a,b)});
+x.strokeStyle='#fff';x.lineWidth=4;x.lineJoin='round';x.stroke();
+x.lineTo(W,H);x.lineTo(0,H);x.closePath();const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(255,255,255,.35)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fill()}
+
+// ---------- settings ----------
+function fillCfg(){const C=view().cfg;
+['risk','sl','rr','fast','slow','maxPos','dailyLoss'].forEach(k=>$(k).value=C[k]);
+['rsi','session'].forEach(k=>$(k).checked=!!C[k]);
+$('chips').innerHTML=Object.keys(PAIRS).map(k=>`<span class="chip ${C.pairs.includes(k)?'on':''}" data-p="${k}">${nm(k)}</span>`).join('');
+$('url').value=L.url;$('key').value=L.key}
+async function setCfg(patch){
+if(live()){try{const j=await api('/api/config',patch);LV.state=j.state;toast('Saved to your bot')}catch(e){toast(e.message)}}
+else{Object.assign(S.cfg,patch);save()}
+render()}
+['risk','sl','rr','fast','slow','maxPos','dailyLoss'].forEach(k=>$(k).onchange=()=>{const v=parseFloat($(k).value);v>0?setCfg({[k]:v}):fillCfg()});
+['rsi','session'].forEach(k=>$(k).onchange=()=>setCfg({[k]:$(k).checked}));
+$('chips').onclick=e=>{const k=e.target.dataset.p;if(!k)return;const C=view().cfg,p=C.pairs.includes(k)?C.pairs.filter(x=>x!==k):[...C.pairs,k];setCfg({pairs:p}).then(fillCfg)};
+
+// ---------- actions ----------
+$('toggle').onclick=async()=>{const V=view();
+if(V.halted)return toast('Halted by the daily limit. Tap New trading day.');
+if(live()){if(!LV)return toast('Connect your Worker first');try{await api('/api/config',{on:!V.on});await poll()}catch(e){toast(e.message)}}
+else{S.on=!S.on;slog(S.on?'Bot started':'Bot paused');save();render()}};
+$('kill').onclick=async()=>{if(live()){try{await api('/api/kill',{});await poll();toast('All trades closed')}catch(e){toast(e.message)}}else{flatten('KILL');S.on=false;save();render()}};
+$('newday').onclick=async()=>{if(live()){try{await api('/api/newday',{});await poll()}catch(e){toast(e.message)}}else{S.dayStart=equity();S.halted=false;save();render()}};
+$('reset').onclick=()=>{if(confirm('Reset the simulation to $10,000?')){S=JSON.parse(JSON.stringify(DEF));save();fillCfg();render()}};
+$('pos').onclick=async e=>{const id=e.target.dataset.id;if(!id)return;
+if(live()){try{await api('/api/close',{id});await poll()}catch(x){toast(x.message)}}
+else{const p=S.pos.find(x=>String(x.id)===id);if(p){simClose(p,M[p.pair].price,'MANUAL');save();render()}}};
+function setMode(m){L.mode=m;ST('atp_conn',L);fillCfg();if(m==='live'){poll()}render()}
+$('m-sim').onclick=()=>setMode('sim');
+$('m-live').onclick=()=>{if(!L.url||!L.key)toast('Enter your Worker URL and app key');setMode('live')};
+$('connect').onclick=async()=>{L.url=$('url').value.trim();L.key=$('key').value.trim();L.mode='live';ST('atp_conn',L);
+$('connMsg').textContent='Connecting…';await poll();if(online){$('connMsg').textContent='Connected to your demo account.';fillCfg();toast('Connected')}};
+document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>{
+document.querySelectorAll('nav a').forEach(n=>n.classList.toggle('on',n===a));
+document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('show',t.id==='t-'+a.dataset.t));
+if(a.dataset.t==='cfg'||a.dataset.t==='link')fillCfg();render()});
+
+// ---------- PWA ----------
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),standalone=navigator.standalone||matchMedia('(display-mode: standalone)').matches;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();const h=$('hint');h.style.display='block';h.innerHTML='Install ArnTech Pilot. <b style="color:#2563eb;cursor:pointer" id="inst">Install</b>';$('inst').onclick=()=>{e.prompt();h.style.display='none'}});
+if(ios&&!standalone){const h=$('hint');h.style.display='block';h.innerHTML='To install: tap <b>Share</b>, then <b>Add to Home Screen</b>.'}
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+(function(){const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=180;c.getContext('2d').drawImage(im,0,0,180,180);$('touchIcon').href=c.toDataURL('image/png')}catch(e){}};im.src='icon.svg'})();
+
+fillCfg();render();
+setInterval(()=>{if(!live()){simTick();render()}},1000);
+setInterval(poll,5000);if(live())poll();
+</script>
+</body>
+</html>
